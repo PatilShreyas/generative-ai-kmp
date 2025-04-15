@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 /*
  * Copyright 2024 Shreyas Patil
@@ -44,6 +45,18 @@ kotlin {
             baseName = "generativeai"
             isStatic = true
         }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "generativeAIGoogle"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "dev.shreyaspatil.generativeai-google.js"
+            }
+        }
+
+        binaries.executable()
     }
 
     sourceSets {
