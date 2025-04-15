@@ -101,12 +101,11 @@ internal constructor(
      * @return A [GenerateContentResponse] after some delay. Function should be called within a
      *   suspend context to properly manage concurrency.
      */
-    suspend fun generateContent(vararg prompt: Content): GenerateContentResponse =
-        try {
-            controller.generateContent(constructRequest(*prompt)).toPublic().validate()
-        } catch (e: Throwable) {
-            throw GoogleGenerativeAIException.from(e)
-        }
+    suspend fun generateContent(vararg prompt: Content): GenerateContentResponse = try {
+        controller.generateContent(constructRequest(*prompt)).toPublic().validate()
+    } catch (e: Throwable) {
+        throw GoogleGenerativeAIException.from(e)
+    }
 
     /**
      * Generates a streaming response from the backend with the provided [Content]s.
@@ -114,11 +113,10 @@ internal constructor(
      * @param prompt A group of [Content]s to send to the model.
      * @return A [Flow] which will emit responses as they are returned from the model.
      */
-    fun generateContentStream(vararg prompt: Content): Flow<GenerateContentResponse> =
-        controller
-            .generateContentStream(constructRequest(*prompt))
-            .catch { throw GoogleGenerativeAIException.from(it) }
-            .map { it.toPublic().validate() }
+    fun generateContentStream(vararg prompt: Content): Flow<GenerateContentResponse> = controller
+        .generateContentStream(constructRequest(*prompt))
+        .catch { throw GoogleGenerativeAIException.from(it) }
+        .map { it.toPublic().validate() }
 
     /**
      * Generates a response from the backend with the provided text represented [Content].
@@ -127,8 +125,7 @@ internal constructor(
      * @return A [GenerateContentResponse] after some delay. Function should be called within a
      *   suspend context to properly manage concurrency.
      */
-    suspend fun generateContent(prompt: String): GenerateContentResponse =
-        generateContent(content { text(prompt) })
+    suspend fun generateContent(prompt: String): GenerateContentResponse = generateContent(content { text(prompt) })
 
     /**
      * Generates a streaming response from the backend with the provided text represented [Content].
@@ -136,8 +133,7 @@ internal constructor(
      * @param prompt The text to be converted into a single piece of [Content] to send to the model.
      * @return A [Flow] which will emit responses as they are returned from the model.
      */
-    fun generateContentStream(prompt: String): Flow<GenerateContentResponse> =
-        generateContentStream(content { text(prompt) })
+    fun generateContentStream(prompt: String): Flow<GenerateContentResponse> = generateContentStream(content { text(prompt) })
 
     /**
      * Generates a response from the backend with the provided bitmap represented [Content].
@@ -146,8 +142,7 @@ internal constructor(
      * @return A [GenerateContentResponse] after some delay. Function should be called within a
      *   suspend context to properly manage concurrency.
      */
-    suspend fun generateContent(prompt: Bitmap): GenerateContentResponse =
-        generateContent(content { image(prompt) })
+    suspend fun generateContent(prompt: Bitmap): GenerateContentResponse = generateContent(content { image(prompt) })
 
     /**
      * Generates a streaming response from the backend with the provided bitmap represented [Content].
@@ -155,8 +150,7 @@ internal constructor(
      * @param prompt The bitmap to be converted into a single piece of [Content] to send to the model.
      * @return A [Flow] which will emit responses as they are returned from the model.
      */
-    fun generateContentStream(prompt: Bitmap): Flow<GenerateContentResponse> =
-        generateContentStream(content { image(prompt) })
+    fun generateContentStream(prompt: Bitmap): Flow<GenerateContentResponse> = generateContentStream(content { image(prompt) })
 
     /** Creates a chat instance which internally tracks the ongoing conversation with the model */
     fun startChat(history: List<Content> = emptyList()): Chat = Chat(this, history.toMutableList())
@@ -167,9 +161,7 @@ internal constructor(
      * @param prompt A group of [Content]s to count tokens of.
      * @return A [CountTokensResponse] containing the number of tokens in the prompt.
      */
-    suspend fun countTokens(vararg prompt: Content): CountTokensResponse {
-        return controller.countTokens(constructCountTokensRequest(*prompt)).toPublic()
-    }
+    suspend fun countTokens(vararg prompt: Content): CountTokensResponse = controller.countTokens(constructCountTokensRequest(*prompt)).toPublic()
 
     /**
      * Counts the number of tokens used in a prompt.
@@ -177,9 +169,7 @@ internal constructor(
      * @param prompt The text to be converted to a single piece of [Content] to count the tokens of.
      * @return A [CountTokensResponse] containing the number of tokens in the prompt.
      */
-    suspend fun countTokens(prompt: String): CountTokensResponse {
-        return countTokens(content { text(prompt) })
-    }
+    suspend fun countTokens(prompt: String): CountTokensResponse = countTokens(content { text(prompt) })
 
     /**
      * Counts the number of tokens used in a prompt.
@@ -187,23 +177,19 @@ internal constructor(
      * @param prompt The image to be converted to a single piece of [Content] to count the tokens of.
      * @return A [CountTokensResponse] containing the number of tokens in the prompt.
      */
-    suspend fun countTokens(prompt: Bitmap): CountTokensResponse {
-        return countTokens(content { image(prompt) })
-    }
+    suspend fun countTokens(prompt: Bitmap): CountTokensResponse = countTokens(content { image(prompt) })
 
-    private fun constructRequest(vararg prompt: Content) =
-        GenerateContentRequest(
-            modelName,
-            prompt.map { it.toInternal() },
-            safetySettings?.map { it.toInternal() },
-            generationConfig?.toInternal(),
-            tools?.map { it.toInternal() },
-            toolConfig?.toInternal(),
-            systemInstruction?.toInternal(),
-        )
+    private fun constructRequest(vararg prompt: Content) = GenerateContentRequest(
+        modelName,
+        prompt.map { it.toInternal() },
+        safetySettings?.map { it.toInternal() },
+        generationConfig?.toInternal(),
+        tools?.map { it.toInternal() },
+        toolConfig?.toInternal(),
+        systemInstruction?.toInternal(),
+    )
 
-    private fun constructCountTokensRequest(vararg prompt: Content) =
-        CountTokensRequest.forGenAI(constructRequest(*prompt))
+    private fun constructCountTokensRequest(vararg prompt: Content) = CountTokensRequest.forGenAI(constructRequest(*prompt))
 
     private fun GenerateContentResponse.validate() = apply {
         if (candidates.isEmpty() && promptFeedback == null) {

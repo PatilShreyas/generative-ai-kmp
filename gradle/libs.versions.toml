@@ -1,13 +1,15 @@
 [versions]
-agp = "8.2.1"
+android-compileSdk = "35"
+android-minSdk = "21"
+agp = "8.9.1"
 kotest-assertions-core = "5.8.0"
-kotlin = "1.9.20"
-coroutines = "1.7.3"
-kotlinx-serialization-json = "1.6.2"
-ktor = "2.3.7"
-slf4j-api = "2.0.11"
-spotless = "6.22.0"
-vanniktechMavenPublish = "0.27.0"
+kotlin = "2.1.0"
+coroutines = "1.10.1"
+kotlinx-serialization-json = "1.8.0"
+ktor = "3.1.2"
+slf4j-api = "2.0.17"
+spotless = "7.0.2"
+vanniktechMavenPublish = "0.31.0"
 mockk = "1.13.10"
 
 [libraries]

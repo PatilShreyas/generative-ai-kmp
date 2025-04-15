@@ -35,164 +35,150 @@ internal class StreamingSnapshotTests {
     private val testTimeout = 5.seconds
 
     @Test
-    fun `short reply`() =
-        goldenStreamingFile("success-basic-reply-short.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `short reply`() = goldenStreamingFile("success-basic-reply-short.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val responseList = responses.toList()
-                responseList.isEmpty() shouldBe false
-                responseList.first().candidates?.first()?.finishReason shouldBe FinishReason.STOP
-                responseList.first().candidates?.first()?.content?.parts?.isEmpty() shouldBe false
-                responseList.first().candidates?.first()?.safetyRatings?.isEmpty() shouldBe false
+        withTimeout(testTimeout) {
+            val responseList = responses.toList()
+            responseList.isEmpty() shouldBe false
+            responseList.first().candidates?.first()?.finishReason shouldBe FinishReason.STOP
+            responseList.first().candidates?.first()?.content?.parts?.isEmpty() shouldBe false
+            responseList.first().candidates?.first()?.safetyRatings?.isEmpty() shouldBe false
+        }
+    }
+
+    @Test
+    fun `long reply`() = goldenStreamingFile("success-basic-reply-long.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+
+        withTimeout(testTimeout) {
+            val responseList = responses.toList()
+            responseList.isEmpty() shouldBe false
+            responseList.forEach {
+                it.candidates?.first()?.finishReason shouldBe FinishReason.STOP
+                it.candidates?.first()?.content?.parts?.isEmpty() shouldBe false
+                it.candidates?.first()?.safetyRatings?.isEmpty() shouldBe false
             }
         }
+    }
 
     @Test
-    fun `long reply`() =
-        goldenStreamingFile("success-basic-reply-long.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `unknown enum`() = goldenStreamingFile("success-unknown-enum.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val responseList = responses.toList()
-                responseList.isEmpty() shouldBe false
-                responseList.forEach {
-                    it.candidates?.first()?.finishReason shouldBe FinishReason.STOP
-                    it.candidates?.first()?.content?.parts?.isEmpty() shouldBe false
-                    it.candidates?.first()?.safetyRatings?.isEmpty() shouldBe false
-                }
-            }
+        withTimeout(testTimeout) {
+            val responseList = responses.toList()
+            responseList.isEmpty() shouldBe false
+            responseList.any {
+                it.candidates?.any {
+                    it.safetyRatings?.any { it.category == HarmCategory.UNKNOWN } ?: false
+                } ?: false
+            } shouldBe true
         }
+    }
 
     @Test
-    fun `unknown enum`() =
-        goldenStreamingFile("success-unknown-enum.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `quotes escaped`() = goldenStreamingFile("success-quotes-escaped.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val responseList = responses.toList()
-                responseList.isEmpty() shouldBe false
-                responseList.any {
-                    it.candidates?.any {
-                        it.safetyRatings?.any { it.category == HarmCategory.UNKNOWN } ?: false
-                    } ?: false
-                } shouldBe true
-            }
+        withTimeout(testTimeout) {
+            val responseList = responses.toList()
+
+            responseList.isEmpty() shouldBe false
+            val part = responseList.first().candidates?.first()?.content?.parts?.first() as? TextPart
+            part.shouldNotBeNull()
+            part.text shouldContain "\""
         }
+    }
 
     @Test
-    fun `quotes escaped`() =
-        goldenStreamingFile("success-quotes-escaped.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `prompt blocked for safety`() = goldenStreamingFile("failure-prompt-blocked-safety.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val responseList = responses.toList()
-
-                responseList.isEmpty() shouldBe false
-                val part = responseList.first().candidates?.first()?.content?.parts?.first() as? TextPart
-                part.shouldNotBeNull()
-                part.text shouldContain "\""
-            }
+        withTimeout(testTimeout) {
+            val exception = shouldThrow<PromptBlockedException> { responses.collect() }
+            exception.response.promptFeedback?.blockReason shouldBe BlockReason.SAFETY
         }
+    }
 
     @Test
-    fun `prompt blocked for safety`() =
-        goldenStreamingFile("failure-prompt-blocked-safety.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `empty content`() = goldenStreamingFile("failure-empty-content.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val exception = shouldThrow<PromptBlockedException> { responses.collect() }
-                exception.response.promptFeedback?.blockReason shouldBe BlockReason.SAFETY
-            }
-        }
+        withTimeout(testTimeout) { shouldThrow<SerializationException> { responses.collect() } }
+    }
 
     @Test
-    fun `empty content`() =
-        goldenStreamingFile("failure-empty-content.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `http errors`() = goldenStreamingFile("failure-http-error.txt", HttpStatusCode.PreconditionFailed) {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) { shouldThrow<SerializationException> { responses.collect() } }
-        }
-
-    @Test
-    fun `http errors`() =
-        goldenStreamingFile("failure-http-error.txt", HttpStatusCode.PreconditionFailed) {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
-
-            withTimeout(testTimeout) { shouldThrow<ServerException> { responses.collect() } }
-        }
+        withTimeout(testTimeout) { shouldThrow<ServerException> { responses.collect() } }
+    }
 
     @Test
-    fun `stopped for safety`() =
-        goldenStreamingFile("failure-finish-reason-safety.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `stopped for safety`() = goldenStreamingFile("failure-finish-reason-safety.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val exception = shouldThrow<ResponseStoppedException> { responses.collect() }
-                exception.response.candidates?.first()?.finishReason shouldBe FinishReason.SAFETY
-            }
+        withTimeout(testTimeout) {
+            val exception = shouldThrow<ResponseStoppedException> { responses.collect() }
+            exception.response.candidates?.first()?.finishReason shouldBe FinishReason.SAFETY
         }
+    }
 
     @Test
-    fun `citation parsed correctly`() =
-        goldenStreamingFile("success-citations.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `citation parsed correctly`() = goldenStreamingFile("success-citations.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val responseList = responses.toList()
-                responseList.any {
-                    it.candidates?.any { it.citationMetadata?.citationSources?.isNotEmpty() ?: false }
-                        ?: false
-                } shouldBe true
-            }
+        withTimeout(testTimeout) {
+            val responseList = responses.toList()
+            responseList.any {
+                it.candidates?.any { it.citationMetadata?.citationSources?.isNotEmpty() ?: false }
+                    ?: false
+            } shouldBe true
         }
+    }
 
     @Test
-    fun `citation returns correctly when using alternative name`() =
-        goldenStreamingFile("success-citations-altname.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `citation returns correctly when using alternative name`() = goldenStreamingFile("success-citations-altname.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val responseList = responses.toList()
-                responseList.any {
-                    it.candidates?.any { it.citationMetadata?.citationSources?.isNotEmpty() ?: false }
-                        ?: false
-                } shouldBe true
-            }
+        withTimeout(testTimeout) {
+            val responseList = responses.toList()
+            responseList.any {
+                it.candidates?.any { it.citationMetadata?.citationSources?.isNotEmpty() ?: false }
+                    ?: false
+            } shouldBe true
         }
+    }
 
     @Test
-    fun `stopped for recitation`() =
-        goldenStreamingFile("failure-recitation-no-content.txt") {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `stopped for recitation`() = goldenStreamingFile("failure-recitation-no-content.txt") {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) {
-                val exception = shouldThrow<ResponseStoppedException> { responses.collect() }
-                exception.response.candidates?.first()?.finishReason shouldBe FinishReason.RECITATION
-            }
+        withTimeout(testTimeout) {
+            val exception = shouldThrow<ResponseStoppedException> { responses.collect() }
+            exception.response.candidates?.first()?.finishReason shouldBe FinishReason.RECITATION
         }
+    }
 
     @Test
-    fun `image rejected`() =
-        goldenStreamingFile("failure-image-rejected.txt", HttpStatusCode.BadRequest) {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `image rejected`() = goldenStreamingFile("failure-image-rejected.txt", HttpStatusCode.BadRequest) {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) { shouldThrow<ServerException> { responses.collect() } }
-        }
-
-    @Test
-    fun `unknown model`() =
-        goldenStreamingFile("failure-unknown-model.txt", HttpStatusCode.NotFound) {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
-
-            withTimeout(testTimeout) { shouldThrow<ServerException> { responses.collect() } }
-        }
+        withTimeout(testTimeout) { shouldThrow<ServerException> { responses.collect() } }
+    }
 
     @Test
-    fun `invalid api key`() =
-        goldenStreamingFile("failure-api-key.txt", HttpStatusCode.BadRequest) {
-            val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+    fun `unknown model`() = goldenStreamingFile("failure-unknown-model.txt", HttpStatusCode.NotFound) {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
 
-            withTimeout(testTimeout) { shouldThrow<InvalidAPIKeyException> { responses.collect() } }
-        }
+        withTimeout(testTimeout) { shouldThrow<ServerException> { responses.collect() } }
+    }
+
+    @Test
+    fun `invalid api key`() = goldenStreamingFile("failure-api-key.txt", HttpStatusCode.BadRequest) {
+        val responses = apiController.generateContentStream(textGenerateContentRequest("prompt"))
+
+        withTimeout(testTimeout) { shouldThrow<InvalidAPIKeyException> { responses.collect() } }
+    }
 }

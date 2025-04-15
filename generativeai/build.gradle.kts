@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 /*
  * Copyright 2024 Shreyas Patil
  *
@@ -23,10 +26,8 @@ plugins {
 
 kotlin {
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     jvm()
@@ -46,6 +47,18 @@ kotlin {
         }
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "generativeAIGoogle"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "dev.shreyaspatil.generativeai-google.js"
+            }
+        }
+
+        binaries.executable()
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(project(":common"))
@@ -63,12 +76,18 @@ kotlin {
 
 android {
     namespace = "dev.shreyaspatil.ai.client.generativeai"
-    compileSdk = 34
+    compileSdk =
+        libs.versions.android.compileSdk
+            .get()
+            .toInt()
 
     buildFeatures.buildConfig = true
 
     defaultConfig {
-        minSdk = 21
+        minSdk =
+            libs.versions.android.minSdk
+                .get()
+                .toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

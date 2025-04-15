@@ -41,11 +41,9 @@ import java.io.File
 
 private val TEST_CLIENT_ID = "genai-android/test"
 
-internal fun prepareStreamingResponse(response: List<GenerateContentResponse>): List<ByteArray> =
-    response.map { "data: ${JSON.encodeToString(it)}$SSE_SEPARATOR".toByteArray() }
+internal fun prepareStreamingResponse(response: List<GenerateContentResponse>): List<ByteArray> = response.map { "data: ${JSON.encodeToString(it)}$SSE_SEPARATOR".toByteArray() }
 
-internal fun prepareResponse(response: GenerateContentResponse) =
-    JSON.encodeToString(response).toByteArray()
+internal fun prepareResponse(response: GenerateContentResponse) = JSON.encodeToString(response).toByteArray()
 
 internal fun createRequest(vararg text: String): GenerateContentRequest {
     val contents = text.map { Content(parts = listOf(TextPart(it))) }
@@ -169,15 +167,14 @@ internal fun goldenUnaryFile(
     name: String,
     httpStatusCode: HttpStatusCode = HttpStatusCode.OK,
     block: CommonTest,
-) =
-    commonTest(httpStatusCode) {
-        val goldenFile = loadGoldenFile("unary/$name")
-        val message = goldenFile.readText()
+) = commonTest(httpStatusCode) {
+    val goldenFile = loadGoldenFile("unary/$name")
+    val message = goldenFile.readText()
 
-        channel.send(message.toByteArray())
+    channel.send(message.toByteArray())
 
-        block()
-    }
+    block()
+}
 
 /**
  * Loads a *Golden File* from the resource directory.

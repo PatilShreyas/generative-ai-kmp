@@ -82,70 +82,64 @@ class Schema<T>(
         /** Registers a schema for a 32 bit integer number */
         @JvmStatic
         @JvmName("numInt")
-        fun int(name: String, description: String) =
-            Schema<Int>(
-                name = name,
-                description = description,
-                format = "int32",
-                type = FunctionType.INTEGER,
-                nullable = false,
-            )
+        fun int(name: String, description: String) = Schema<Int>(
+            name = name,
+            description = description,
+            format = "int32",
+            type = FunctionType.INTEGER,
+            nullable = false,
+        )
 
         /** Registers a schema for a 64 bit integer number */
         @JvmStatic
         @JvmName("numLong")
-        fun long(name: String, description: String) =
-            Schema<Long>(
-                name = name,
-                description = description,
-                type = FunctionType.LONG,
-                nullable = false,
-            )
+        fun long(name: String, description: String) = Schema<Long>(
+            name = name,
+            description = description,
+            type = FunctionType.LONG,
+            nullable = false,
+        )
 
         /** Registers a schema for a string */
         @JvmStatic
-        fun str(name: String, description: String) =
-            Schema<String>(
-                name = name,
-                description = description,
-                type = FunctionType.STRING,
-                nullable = false,
-            )
+        fun str(name: String, description: String) = Schema<String>(
+            name = name,
+            description = description,
+            type = FunctionType.STRING,
+            nullable = false,
+        )
 
         /** Registers a schema for a boolean */
         @JvmStatic
-        fun bool(name: String, description: String) =
-            Schema<Boolean>(
-                name = name,
-                description = description,
-                type = FunctionType.BOOLEAN,
-                nullable = false,
-            )
+        fun bool(name: String, description: String) = Schema<Boolean>(
+            name = name,
+            description = description,
+            type = FunctionType.BOOLEAN,
+            nullable = false,
+        )
 
         /** Registers a schema for a floating point number */
         @JvmStatic
         @JvmName("numDouble")
-        fun double(name: String, description: String) =
-            Schema<Double>(
-                name = name,
-                description = description,
-                type = FunctionType.NUMBER,
-                nullable = false,
-            )
+        fun double(name: String, description: String) = Schema<Double>(
+            name = name,
+            description = description,
+            type = FunctionType.NUMBER,
+            nullable = false,
+        )
 
         /**
          * Registers a schema for a complex object. In a function it will be returned as a [JSONObject]
          */
         @JvmStatic
-        fun obj(name: String, description: String, vararg contents: Schema<out Any>) =
-            Schema<JsonObject>(
-                name = name,
-                description = description,
-                type = FunctionType.OBJECT,
-                required = contents.map { it.name },
-                properties = contents.associateBy { it.name }.toMap(),
-                nullable = false,
-            )
+        fun obj(name: String, description: String, vararg contents: Schema<out Any>) = Schema<JsonObject>(
+            name = name,
+            description = description,
+            type = FunctionType.OBJECT,
+            required = contents.map { it.name },
+            properties = contents.associateBy { it.name }.toMap(),
+            nullable = false,
+        )
 
         /**
          * Registers a schema for an array.
@@ -153,27 +147,25 @@ class Schema<T>(
          * @param items can be used to specify the type of the array
          */
         @JvmStatic
-        fun arr(name: String, description: String, items: Schema<out Any>? = null) =
-            Schema<List<String>>(
-                name = name,
-                description = description,
-                type = FunctionType.ARRAY,
-                items = items,
-                nullable = false,
-            )
+        fun arr(name: String, description: String, items: Schema<out Any>? = null) = Schema<List<String>>(
+            name = name,
+            description = description,
+            type = FunctionType.ARRAY,
+            items = items,
+            nullable = false,
+        )
 
         /** Registers a schema for an enum */
         @JvmStatic
         @JvmName("enumeration")
-        fun enum(name: String, description: String, values: List<String>) =
-            Schema<String>(
-                name = name,
-                description = description,
-                format = "enum",
-                enum = values,
-                type = FunctionType.STRING,
-                nullable = false,
-            )
+        fun enum(name: String, description: String, values: List<String>) = Schema<String>(
+            name = name,
+            description = description,
+            format = "enum",
+            enum = values,
+            type = FunctionType.STRING,
+            nullable = false,
+        )
     }
 }
 

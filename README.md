@@ -33,7 +33,7 @@ Supports the following Kotlin Multiplatform targets:
 - [x] iOS
 - [x] JVM
 - [x] JS
-- [x] Wasm (_Use this [version](https://github.com/PatilShreyas/generative-ai-kmp/releases/tag/v0.9.0-1.0.1-wasm)_)
+- [x] Wasm
 
 ## Installation and usage
 
@@ -59,7 +59,7 @@ The versioning scheme is of the form `X-Y` where:
 
 X is the _Generative AI  Android SDK_ version that is being tracked.
 Y is the _Multiplatform SDK_ version.
-For example, if _Generative AI  Android SDK_ is on `0.9.0` and _Multiplatform SDK_ is on `1.0.1`, the artifact for a release will be `dev.shreyaspatil.generativeai:generativeai-google:0.9.0-1.0.1`.
+For example, if _Generative AI  Android SDK_ is on `0.9.0` and _Multiplatform SDK_ is on `1.1.0`, the artifact for a release will be `dev.shreyaspatil.generativeai:generativeai-google:0.9.0-1.1.0`.
 
 ## Try sample app
 
