@@ -68,14 +68,13 @@ internal class APIControllerTests {
     }
 
     @Test
-    fun `(generateContent) respects a custom timeout`() =
-        commonTest(requestOptions = RequestOptions(2.seconds)) {
-            shouldThrow<RequestTimeoutException> {
-                withTimeout(testTimeout) {
-                    apiController.generateContent(textGenerateContentRequest("test"))
-                }
+    fun `(generateContent) respects a custom timeout`() = commonTest(requestOptions = RequestOptions(2.seconds)) {
+        shouldThrow<RequestTimeoutException> {
+            withTimeout(testTimeout) {
+                apiController.generateContent(textGenerateContentRequest("test"))
             }
         }
+    }
 }
 
 internal class RequestFormatTests {
@@ -206,8 +205,7 @@ internal class RequestFormatTests {
                 override val timeout: Duration
                     get() = 5.seconds
 
-                override suspend fun generateHeaders(): Map<String, String> =
-                    mapOf("header1" to "value1", "header2" to "value2")
+                override suspend fun generateHeaders(): Map<String, String> = mapOf("header1" to "value1", "header2" to "value2")
             }
 
         val controller =
@@ -325,22 +323,19 @@ internal class RequestFormatTests {
     }
 
     companion object {
-        fun models() =
-            listOf(
-                arrayOf("gemini-pro", "models/gemini-pro"),
-                arrayOf("x/gemini-pro", "x/gemini-pro"),
-                arrayOf("models/gemini-pro", "models/gemini-pro"),
-                arrayOf("/modelname", "/modelname"),
-                arrayOf("modifiedNaming/mymodel", "modifiedNaming/mymodel"),
-            )
+        fun models() = listOf(
+            arrayOf("gemini-pro", "models/gemini-pro"),
+            arrayOf("x/gemini-pro", "x/gemini-pro"),
+            arrayOf("models/gemini-pro", "models/gemini-pro"),
+            arrayOf("/modelname", "/modelname"),
+            arrayOf("modifiedNaming/mymodel", "modifiedNaming/mymodel"),
+        )
     }
 }
 
-fun textGenerateContentRequest(prompt: String) =
-    GenerateContentRequest(
-        model = "unused",
-        contents = listOf(Content(parts = listOf(TextPart(prompt)))),
-    )
+fun textGenerateContentRequest(prompt: String) = GenerateContentRequest(
+    model = "unused",
+    contents = listOf(Content(parts = listOf(TextPart(prompt)))),
+)
 
-fun textCountTokenRequest(prompt: String) =
-    CountTokensRequest(generateContentRequest = textGenerateContentRequest(prompt))
+fun textCountTokenRequest(prompt: String) = CountTokensRequest(generateContentRequest = textGenerateContentRequest(prompt))

@@ -46,20 +46,18 @@ data class CountTokensRequest(
     @SerialName("system_instruction") val systemInstruction: Content? = null,
 ) : Request {
     companion object {
-        fun forGenAI(generateContentRequest: GenerateContentRequest) =
-            CountTokensRequest(
-                generateContentRequest =
-                generateContentRequest.model?.let {
-                    generateContentRequest.copy(model = fullModelName(it))
-                } ?: generateContentRequest,
-            )
+        fun forGenAI(generateContentRequest: GenerateContentRequest) = CountTokensRequest(
+            generateContentRequest =
+            generateContentRequest.model?.let {
+                generateContentRequest.copy(model = fullModelName(it))
+            } ?: generateContentRequest,
+        )
 
-        fun forVertexAI(generateContentRequest: GenerateContentRequest) =
-            CountTokensRequest(
-                model = generateContentRequest.model?.let { fullModelName(it) },
-                contents = generateContentRequest.contents,
-                tools = generateContentRequest.tools,
-                systemInstruction = generateContentRequest.systemInstruction,
-            )
+        fun forVertexAI(generateContentRequest: GenerateContentRequest) = CountTokensRequest(
+            model = generateContentRequest.model?.let { fullModelName(it) },
+            contents = generateContentRequest.contents,
+            tools = generateContentRequest.tools,
+            systemInstruction = generateContentRequest.systemInstruction,
+        )
     }
 }

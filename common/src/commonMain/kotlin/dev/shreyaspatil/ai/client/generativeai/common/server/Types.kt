@@ -60,7 +60,9 @@ data class Candidate(
 @Serializable
 data class CitationMetadata
 @OptIn(ExperimentalSerializationApi::class)
-constructor(@JsonNames("citations") val citationSources: List<CitationSources>)
+constructor(
+    @JsonNames("citations") val citationSources: List<CitationSources>,
+)
 
 @Serializable
 data class CitationSources(

@@ -18,21 +18,15 @@ package dev.shreyaspatil.ai.client.generativeai.type
 import android.graphics.Bitmap
 import java.io.ByteArrayOutputStream
 
-fun Bitmap.asPlatformImage() =
-    dev.shreyaspatil.ai.client.generativeai.type.PlatformImage(
-        dev.shreyaspatil.ai.client.generativeai.type.platformImageFromBitmap(this),
-    )
+fun Bitmap.asPlatformImage() = dev.shreyaspatil.ai.client.generativeai.type.PlatformImage(
+    dev.shreyaspatil.ai.client.generativeai.type.platformImageFromBitmap(this),
+)
 
-fun ByteArray.asBitmap(): Bitmap? =
-    dev.shreyaspatil.ai.client.generativeai.type.bitmapFromBytes(this)
+fun ByteArray.asBitmap(): Bitmap? = dev.shreyaspatil.ai.client.generativeai.type.bitmapFromBytes(this)
 
-private fun platformImageFromBitmap(bitmap: Bitmap): ByteArray {
-    return ByteArrayOutputStream().let {
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
-        it.toByteArray()
-    }
+private fun platformImageFromBitmap(bitmap: Bitmap): ByteArray = ByteArrayOutputStream().let {
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
+    it.toByteArray()
 }
 
-private fun bitmapFromBytes(data: ByteArray): Bitmap? {
-    return android.graphics.BitmapFactory.decodeByteArray(data, 0, data.size)
-}
+private fun bitmapFromBytes(data: ByteArray): Bitmap? = android.graphics.BitmapFactory.decodeByteArray(data, 0, data.size)

@@ -34,9 +34,7 @@ fun UIImage.asPlatformImage(): PlatformImage {
 
 fun ByteArray.asUIImage(): UIImage? = uiImageFromBytes(this)
 
-private fun uiImageFromBytes(data: ByteArray): UIImage? {
-    return UIImage.imageWithData(data.toImageBytes())
-}
+private fun uiImageFromBytes(data: ByteArray): UIImage? = UIImage.imageWithData(data.toImageBytes())
 
 @OptIn(ExperimentalForeignApi::class)
 private fun ByteArray.toImageBytes(): NSData = memScoped {

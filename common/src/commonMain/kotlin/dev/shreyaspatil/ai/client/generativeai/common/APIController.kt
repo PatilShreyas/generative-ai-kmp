@@ -123,42 +123,39 @@ internal constructor(
         }
     }
 
-    suspend fun generateContent(request: GenerateContentRequest): GenerateContentResponse =
-        try {
-            client
-                .post("${requestOptions.endpoint}/${requestOptions.apiVersion}/$model:generateContent") {
-                    applyCommonConfiguration(request)
-                    applyHeaderProvider()
-                }
-                .also { validateResponse(it) }
-                .body<GenerateContentResponse>()
-                .validate()
-        } catch (e: Throwable) {
-            throw GoogleGenerativeAIException.from(e)
-        }
-
-    fun generateContentStream(request: GenerateContentRequest): Flow<GenerateContentResponse> =
+    suspend fun generateContent(request: GenerateContentRequest): GenerateContentResponse = try {
         client
-            .postStream<GenerateContentResponse>(
-                "${requestOptions.endpoint}/${requestOptions.apiVersion}/$model:streamGenerateContent?alt=sse",
-            ) {
+            .post("${requestOptions.endpoint}/${requestOptions.apiVersion}/$model:generateContent") {
                 applyCommonConfiguration(request)
+                applyHeaderProvider()
             }
-            .map { it.validate() }
-            .catch { throw GoogleGenerativeAIException.from(it) }
+            .also { validateResponse(it) }
+            .body<GenerateContentResponse>()
+            .validate()
+    } catch (e: Throwable) {
+        throw GoogleGenerativeAIException.from(e)
+    }
 
-    suspend fun countTokens(request: CountTokensRequest): CountTokensResponse =
-        try {
-            client
-                .post("${requestOptions.endpoint}/${requestOptions.apiVersion}/$model:countTokens") {
-                    applyCommonConfiguration(request)
-                    applyHeaderProvider()
-                }
-                .also { validateResponse(it) }
-                .body()
-        } catch (e: Throwable) {
-            throw GoogleGenerativeAIException.from(e)
+    fun generateContentStream(request: GenerateContentRequest): Flow<GenerateContentResponse> = client
+        .postStream<GenerateContentResponse>(
+            "${requestOptions.endpoint}/${requestOptions.apiVersion}/$model:streamGenerateContent?alt=sse",
+        ) {
+            applyCommonConfiguration(request)
         }
+        .map { it.validate() }
+        .catch { throw GoogleGenerativeAIException.from(it) }
+
+    suspend fun countTokens(request: CountTokensRequest): CountTokensResponse = try {
+        client
+            .post("${requestOptions.endpoint}/${requestOptions.apiVersion}/$model:countTokens") {
+                applyCommonConfiguration(request)
+                applyHeaderProvider()
+            }
+            .also { validateResponse(it) }
+            .body()
+    } catch (e: Throwable) {
+        throw GoogleGenerativeAIException.from(e)
+    }
 
     private fun HttpRequestBuilder.applyCommonConfiguration(request: Request) {
         when (request) {

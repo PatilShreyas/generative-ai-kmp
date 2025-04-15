@@ -59,17 +59,16 @@ private constructor(
 
         @JvmField var responseSchema: Schema<*>? = null
 
-        fun build() =
-            GenerationConfig(
-                temperature = temperature,
-                topK = topK,
-                topP = topP,
-                candidateCount = candidateCount,
-                maxOutputTokens = maxOutputTokens,
-                stopSequences = stopSequences,
-                responseMimeType = responseMimeType,
-                responseSchema = responseSchema,
-            )
+        fun build() = GenerationConfig(
+            temperature = temperature,
+            topK = topK,
+            topP = topP,
+            candidateCount = candidateCount,
+            maxOutputTokens = maxOutputTokens,
+            stopSequences = stopSequences,
+            responseMimeType = responseMimeType,
+            responseSchema = responseSchema,
+        )
     }
 
     companion object {
