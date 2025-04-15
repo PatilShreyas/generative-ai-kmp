@@ -9,7 +9,7 @@ kotlinx-serialization-json = "1.8.0"
 ktor = "3.1.2"
 slf4j-api = "2.0.17"
 spotless = "7.0.2"
-vanniktechMavenPublish = "0.27.0"
+vanniktechMavenPublish = "0.31.0"
 mockk = "1.13.10"
 
 [libraries]
