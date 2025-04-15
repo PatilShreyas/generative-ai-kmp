@@ -63,12 +63,12 @@ kotlin {
 
 android {
     namespace = "dev.shreyaspatil.ai.client.generativeai"
-    compileSdk = 34
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     buildFeatures.buildConfig = true
 
     defaultConfig {
-        minSdk = 21
+        minSdk = libs.versions.android.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")

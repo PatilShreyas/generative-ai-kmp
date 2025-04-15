@@ -1,4 +1,6 @@
 [versions]
+android-compileSdk = "35"
+android-minSdk = "21"
 agp = "8.2.2"
 kotest-assertions-core = "5.8.0"
 kotlin = "2.0.21"
